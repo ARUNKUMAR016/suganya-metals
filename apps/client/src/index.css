@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: rgba(245, 222, 179, 0.2);
+  color: #4B3621;
+  @apply font-sans;
+}

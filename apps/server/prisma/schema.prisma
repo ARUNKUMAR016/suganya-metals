@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  role_name   String   @unique
+  rate_per_kg Decimal
+  active      Boolean  @default(true)
+  labours     Labour[]
+  production  ProductionDay[]
+}
+
+model Labour {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String?
+  role_id   Int
+  active    Boolean  @default(true)
+  role      Role     @relation(fields: [role_id], references: [id])
+  production ProductionDay[]
+  payments  Payment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id            Int              @id @default(autoincrement())
+  product_name  String           @unique
+  items         ProductionItem[]
+}
+
+model ProductionDay {
+  id          Int              @id @default(autoincrement())
+  date        DateTime
+  labour_id   Int
+  role_id     Int
+  rate_per_kg Decimal
+  labour      Labour           @relation(fields: [labour_id], references: [id])
+  role        Role             @relation(fields: [role_id], references: [id])
+  items       ProductionItem[]
+  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([date, labour_id])
+}
+
+model ProductionItem {
+  id                Int           @id @default(autoincrement())
+  production_day_id Int
+  product_id        Int
+  pcs              Int           @default(0)
+  quantity_kg      Decimal
+  amount           Decimal
+  
+  productionDay    ProductionDay @relation(fields: [production_day_id], references: [id], onDelete: Cascade)
+  product          Product       @relation(fields: [product_id], references: [id])
+}
+
+model Payment {
+  id           Int      @id @default(autoincrement())
+  labour_id    Int
+  week_start   DateTime
+  week_end     DateTime
+  total_amount Decimal
+  paid_on      DateTime @default(now())
+  remarks      String?
+  
+  labour       Labour   @relation(fields: [labour_id], references: [id])
+}
