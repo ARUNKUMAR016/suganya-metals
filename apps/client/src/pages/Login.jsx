@@ -153,7 +153,7 @@ const Login = () => {
           <p className="text-xs text-dark-brown/60 bg-sandal/30 px-4 py-2 rounded-lg inline-block border border-gold/10">
             Default credentials:{" "}
             <span className="font-semibold text-kumkum">
-              admin / suganya123
+              admin / sugany123
             </span>
           </p>
         </div>
