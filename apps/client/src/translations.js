@@ -23,7 +23,7 @@ export const translations = {
     weeklySalary: "Weekly Salary",
     advanceEntry: "Advance Entry",
     advanceHistory: "Advance History",
-    payments: "Payments",
+
     logout: "Logout",
     loggedInAs: "Logged in as",
 
@@ -67,9 +67,7 @@ export const translations = {
     lessAdvance: "Less Advance",
     netAmount: "Net Payable",
     totalAmount: "Total Amount",
-    status: "Status",
-    paid: "Paid",
-    pending: "Pending",
+
     totalPayable: "TOTAL PAYABLE",
   },
   ta: {
@@ -96,7 +94,7 @@ export const translations = {
     weeklySalary: "வார சம்பளம்",
     advanceEntry: "முன்பணம் பதிவு",
     advanceHistory: "முன்பணம் வரலாறு",
-    payments: "பரிவர்த்தனைகள்",
+
     logout: "வெளியேறு",
     loggedInAs: "உள்நுழைந்துள்ளவர்",
 
@@ -140,9 +138,7 @@ export const translations = {
     lessAdvance: "முன்பணம் கழிவு",
     netAmount: "வழங்க வேண்டிய தொகை",
     totalAmount: "மொத்த தொகை",
-    status: "நிலை",
-    paid: "செலுத்தப்பட்டது",
-    pending: "நிலுவை",
+
     totalPayable: "மொத்த தொகை",
   },
 };

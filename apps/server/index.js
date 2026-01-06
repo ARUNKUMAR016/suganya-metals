@@ -31,7 +31,7 @@ const labourRoutes = require("./src/routes/labourRoutes");
 const productRoutes = require("./src/routes/productRoutes");
 const productionRoutes = require("./src/routes/productionRoutes");
 const salaryRoutes = require("./src/routes/salaryRoutes");
-const paymentRoutes = require("./src/routes/paymentRoutes");
+
 const authRoutes = require("./src/routes/authRoutes");
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 
@@ -42,10 +42,8 @@ app.use("/api/labours", labourRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/production", productionRoutes);
 app.use("/api/salary", salaryRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/advances", require("./src/routes/advanceRoutes"));
 
-app.use("/api/payments", paymentRoutes);
+app.use("/api/advances", require("./src/routes/advanceRoutes"));
 
 // Serve static files from the client app
 app.use(express.static(path.join(__dirname, "../client/dist")));
@@ -58,7 +56,7 @@ app.get(/(.*)/, (req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Global Error:", err);
   res.status(500).json({ error: "Something went wrong!" });
 });
 

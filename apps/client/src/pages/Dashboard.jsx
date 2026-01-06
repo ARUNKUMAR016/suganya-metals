@@ -23,7 +23,7 @@ const StatCard = ({
   onClick,
 }) => (
   <div
-    className={`relative bg-gradient-to-br ${gradient} rounded-2xl shadow-lg hover:shadow-2xl p-6 cursor-pointer transform hover:-translate-y-2 transition-all duration-300 group overflow-hidden`}
+    className={`relative bg-gradient-to-br ${gradient} rounded-2xl shadow-lg hover:shadow-2xl p-6 cursor-pointer transform hover:-translate-y-2 active:scale-95 transition-all duration-300 group overflow-hidden`}
     onClick={onClick}
   >
     {/* Decorative circles */}
@@ -59,7 +59,7 @@ const StatCard = ({
 
 const ResourceCard = ({ icon: Icon, label, count, color, onClick }) => (
   <div
-    className={`flex items-center justify-between p-4 bg-gradient-to-br ${color} rounded-xl cursor-pointer hover:shadow-lg transform hover:scale-105 transition-all duration-200 group`}
+    className={`flex items-center justify-between p-4 bg-gradient-to-br ${color} rounded-xl cursor-pointer hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200 group`}
     onClick={onClick}
   >
     <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ const Dashboard = () => {
       </div>
 
       {/* Resources & Payments Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Active Resources */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
           <div className="flex items-center gap-3 mb-6">
@@ -164,7 +164,7 @@ const Dashboard = () => {
               Active Resources
             </h2>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <ResourceCard
               icon={Users}
               label="Labours"
@@ -187,53 +187,6 @@ const Dashboard = () => {
               onClick={() => navigate("/products")}
             />
           </div>
-        </div>
-
-        {/* Recent Payments */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg">
-                <CreditCard size={20} className="text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-800">
-                Recent Payments
-              </h2>
-            </div>
-            <button
-              onClick={() => navigate("/payments")}
-              className="text-sm text-blue-600 hover:text-blue-700 font-semibold hover:underline"
-            >
-              View All
-            </button>
-          </div>
-          {stats?.recentPayments && stats.recentPayments.length > 0 ? (
-            <div className="space-y-3">
-              {stats.recentPayments.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all cursor-pointer group"
-                >
-                  <div>
-                    <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                      {payment.labourName}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {new Date(payment.paidOn).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p className="font-bold text-green-600 text-lg">
-                    ₹{payment.amount}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <CreditCard size={48} className="mx-auto mb-3 text-gray-300" />
-              <p className="text-gray-400">No recent payments</p>
-            </div>
-          )}
         </div>
       </div>
 

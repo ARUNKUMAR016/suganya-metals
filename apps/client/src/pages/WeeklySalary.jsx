@@ -59,7 +59,6 @@ const WeeklySalary = () => {
       [`${t("grossAmount")} (₹)`]: item.total_amount.toFixed(2),
       [`${t("lessAdvance")} (₹)`]: item.total_advance.toFixed(2),
       [`${t("netAmount")} (₹)`]: item.net_payable.toFixed(2),
-      [t("status")]: item.status,
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
@@ -211,7 +210,6 @@ const WeeklySalary = () => {
                   {t("lessAdvance")}
                 </th>
                 <th className="p-4 text-right">{t("netAmount")}</th>
-                <th className="p-4 text-center">{t("status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -239,17 +237,6 @@ const WeeklySalary = () => {
                   </td>
                   <td className="p-4 text-right font-bold text-green-600">
                     ₹{item.net_payable.toFixed(2)}
-                  </td>
-                  <td className="p-4 text-center">
-                    {item.status === "Paid" ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                        <CheckCircle size={12} /> {t("paid")}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                        {t("pending")}
-                      </span>
-                    )}
                   </td>
                 </tr>
               ))}

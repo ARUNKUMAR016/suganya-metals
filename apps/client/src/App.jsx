@@ -12,7 +12,7 @@ import LabourMaster from "./pages/LabourMaster";
 import ProductMaster from "./pages/ProductMaster";
 import ProductionEntry from "./pages/ProductionEntry";
 import WeeklySalary from "./pages/WeeklySalary";
-import Payments from "./pages/Payments";
+
 import LabourAdvance from "./pages/LabourAdvance";
 import AdvanceHistory from "./pages/AdvanceHistory";
 
@@ -58,7 +58,6 @@ function App() {
                 <Route path="/salary" element={<WeeklySalary />} />
                 <Route path="/advances" element={<LabourAdvance />} />
                 <Route path="/advances/history" element={<AdvanceHistory />} />
-                <Route path="/payments" element={<Payments />} />
               </Route>
             </Routes>
           </BrowserRouter>

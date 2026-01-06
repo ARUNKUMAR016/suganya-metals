@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -24,7 +24,7 @@ model Labour {
   active    Boolean  @default(true)
   role      Role     @relation(fields: [role_id], references: [id])
   production ProductionDay[]
-  payments  Payment[]
+
   advances  LabourAdvance[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,17 +64,7 @@ model ProductionItem {
   product          Product       @relation(fields: [product_id], references: [id])
 }
 
-model Payment {
-  id           Int      @id @default(autoincrement())
-  labour_id    Int
-  week_start   DateTime
-  week_end     DateTime
-  total_amount Decimal
-  paid_on      DateTime @default(now())
-  remarks      String?
-  
-  labour       Labour   @relation(fields: [labour_id], references: [id])
-}
+
 
 model LabourAdvance {
   id        Int      @id @default(autoincrement())

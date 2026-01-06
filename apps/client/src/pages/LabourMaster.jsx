@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api";
-import { Plus, Edit2, User, Phone } from "lucide-react";
+import { Plus, Edit2, User, Phone, Trash2, Search } from "lucide-react";
 
 const LabourMaster = () => {
   const queryClient = useQueryClient();
@@ -12,6 +12,7 @@ const LabourMaster = () => {
     phone: "",
     role_id: "",
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch Labours
   const { data: labours, isLoading: isLaboursLoading } = useQuery({
@@ -78,25 +79,162 @@ const LabourMaster = () => {
     queryClient.invalidateQueries(["labours"]);
   };
 
+  /* Delete Confirmation State */
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    isOpen: false,
+    labourId: null,
+    labourName: "",
+  });
+
+  /* Toast State */
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ ...toast, show: false }), 3000);
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      return api.delete(`/labours/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["labours"]);
+      showToast("Labour deleted successfully", "success");
+      setDeleteConfirmation({ isOpen: false, labourId: null, labourName: "" });
+    },
+    onError: (error) => {
+      showToast(
+        error.response?.data?.error || "Failed to delete labour",
+        "error"
+      );
+      setDeleteConfirmation({ isOpen: false, labourId: null, labourName: "" });
+    },
+  });
+
+  const handleDeleteClick = (labour) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      labourId: labour.id,
+      labourName: labour.name,
+    });
+  };
+
+  const calculateTotalAdvance = (labourId) => {
+    // This is a placeholder as advance logic isn't fully visible in this snippet.
+    // Assuming handled by backend validation mostly.
+    return 0;
+  };
+
+  const filteredLabours = labours?.filter(
+    (labour) =>
+      labour.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (labour.phone && labour.phone.includes(searchTerm)) ||
+      (labour.role?.role_name &&
+        labour.role.role_name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  // ... (previous helper functions: openModal, closeModal, handleSubmit, handleToggleActive)
+
   if (isLaboursLoading) return <div className="p-4">Loading...</div>;
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Labour Master</h1>
-        <button
-          onClick={() => openModal()}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+      {/* Toast Notification */}
+      {toast.show && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 animate-fadeIn ${
+            toast.type === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
         >
-          <Plus size={20} /> Add Labour
-        </button>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmation.isOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-scaleIn border border-red-100">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={32} className="text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Delete Labour?
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Are you sure you want to delete{" "}
+                <span className="font-semibold text-gray-800">
+                  "{deleteConfirmation.labourName}"
+                </span>
+                ? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() =>
+                    setDeleteConfirmation({
+                      isOpen: false,
+                      labourId: null,
+                      labourName: "",
+                    })
+                  }
+                  className="px-5 py-2.5 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() =>
+                    deleteMutation.mutate(deleteConfirmation.labourId)
+                  }
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                >
+                  {deleteMutation.isLoading ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Labour Master</h1>
+
+        <div className="flex w-full md:w-auto gap-4">
+          <div className="relative flex-1 md:w-64">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search labours..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={() => openModal()}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+          >
+            <Plus size={20} /> Add Labour
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {labours?.map((labour) => (
+        {filteredLabours?.map((labour) => (
           <div
             key={labour.id}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-lg transition-all duration-200 group"
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-lg transition-all duration-200 group relative overflow-hidden"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
@@ -112,12 +250,20 @@ const LabourMaster = () => {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => openModal(labour)}
-                className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-all"
-              >
-                <Edit2 size={18} />
-              </button>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => openModal(labour)}
+                  className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-all"
+                >
+                  <Edit2 size={18} />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(labour)}
+                  className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
 
             {labour.phone && (
@@ -249,10 +395,10 @@ const LabourMaster = () => {
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
+          animation: fadeIn 0.15s ease-out;
         }
         .animate-scaleIn {
-          animation: scaleIn 0.3s ease-out;
+          animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
       `}</style>
     </div>

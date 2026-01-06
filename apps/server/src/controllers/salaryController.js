@@ -34,13 +34,6 @@ const getWeeklySalary = async (req, res) => {
     });
 
     // 2. Check for Payments and Advances made in this week
-    const payments = await prisma.payment.findMany({
-      where: {
-        week_start: new Date(startOfWeek),
-        week_end: new Date(endOfWeek),
-        ...(labourId ? { labour_id: parseInt(labourId) } : {}),
-      },
-    });
 
     const advances = await prisma.labourAdvance.findMany({
       where: {
@@ -66,7 +59,6 @@ const getWeeklySalary = async (req, res) => {
           total_advance: 0,
           net_payable: 0,
           days_worked: 0,
-          status: "Unpaid",
         };
       }
 
@@ -95,11 +87,6 @@ const getWeeklySalary = async (req, res) => {
 
     // 5. Transform to Array and Attach Payment Status
     const salaryReport = Object.values(salaryMap).map((s) => {
-      const payment = payments.find((p) => p.labour_id === s.labour_id);
-      if (payment) {
-        s.status = "Paid";
-        s.payment_details = payment;
-      }
       return s;
     });
 

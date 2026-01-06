@@ -15,7 +15,7 @@ const SidebarItem = ({ to, icon, label, isOpen }) => {
       className={`flex items-center p-3 my-1 rounded-lg transition-all duration-200 group ${
         isActive
           ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/30"
-          : "text-gray-300 hover:bg-gray-800/50 hover:text-white hover:translate-x-1"
+          : "text-gray-300 hover:bg-gray-800/50 hover:text-white hover:translate-x-1 active:scale-95"
       }`}
     >
       <span className="text-xl transform group-hover:scale-110 transition-transform duration-200">
@@ -231,12 +231,6 @@ const Layout = () => {
             label={t("advanceHistory")}
             isOpen={isSidebarOpen}
           />
-          <SidebarItem
-            to="/payments"
-            icon="💳"
-            label={t("payments")}
-            isOpen={isSidebarOpen}
-          />
         </nav>
 
         <div className="p-4 border-t border-gray-700/50 bg-gray-900/30">
@@ -250,7 +244,7 @@ const Layout = () => {
           )}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 p-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full flex items-center justify-center gap-2 p-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
           >
             <LogOut size={18} />
             {isSidebarOpen && (

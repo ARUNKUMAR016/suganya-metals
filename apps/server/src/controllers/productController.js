@@ -44,4 +44,29 @@ const updateProduct = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, createProduct, updateProduct };
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const productId = parseInt(id);
+
+    // Check for dependencies
+    const productionCount = await prisma.productionItem.count({
+      where: { product_id: productId },
+    });
+    if (productionCount > 0) {
+      return res.status(400).json({
+        error: "Cannot delete product: Associated with production records.",
+      });
+    }
+
+    await prisma.product.delete({
+      where: { id: productId },
+    });
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+};
+
+module.exports = { getProducts, createProduct, updateProduct, deleteProduct };

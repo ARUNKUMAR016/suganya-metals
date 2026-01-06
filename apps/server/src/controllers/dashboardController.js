@@ -86,15 +86,6 @@ const getDashboardStats = async (req, res) => {
     const activeRoles = await prisma.role.count({ where: { active: true } });
     const totalProducts = await prisma.product.count();
 
-    // 4. Recent Payments
-    const recentPayments = await prisma.payment.findMany({
-      take: 5,
-      orderBy: { paid_on: "desc" },
-      include: {
-        labour: true,
-      },
-    });
-
     res.json({
       today: {
         labours: todayStats.labours,
@@ -111,14 +102,6 @@ const getDashboardStats = async (req, res) => {
         activeRoles,
         totalProducts,
       },
-      recentPayments: recentPayments.map((p) => ({
-        id: p.id,
-        labourName: p.labour.name,
-        amount: parseFloat(p.total_amount).toFixed(2),
-        paidOn: p.paid_on,
-        weekStart: p.week_start,
-        weekEnd: p.week_end,
-      })),
     });
   } catch (error) {
     console.error(error);

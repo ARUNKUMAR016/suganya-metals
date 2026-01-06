@@ -52,4 +52,38 @@ const updateLabour = async (req, res) => {
   }
 };
 
-module.exports = { getLabours, createLabour, updateLabour };
+const deleteLabour = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const labourId = parseInt(id);
+
+    // Check for dependencies
+    const productionCount = await prisma.productionDay.count({
+      where: { labour_id: labourId },
+    });
+    if (productionCount > 0) {
+      return res.status(400).json({
+        error: "Cannot delete labour: Associated with production records.",
+      });
+    }
+
+    const advanceCount = await prisma.labourAdvance.count({
+      where: { labour_id: labourId },
+    });
+    if (advanceCount > 0) {
+      return res.status(400).json({
+        error: "Cannot delete labour: has advance payments records.",
+      });
+    }
+
+    await prisma.labour.delete({
+      where: { id: labourId },
+    });
+    res.json({ message: "Labour deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete labour" });
+  }
+};
+
+module.exports = { getLabours, createLabour, updateLabour, deleteLabour };
