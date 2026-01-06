@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
 
 const SidebarItem = ({ to, icon, label, isOpen }) => {
@@ -94,8 +96,9 @@ const DropdownSection = ({ title, icon, items, isOpen, isSidebarOpen }) => {
 };
 
 const Layout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
   const { logout, user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -106,28 +109,45 @@ const Layout = () => {
   };
 
   const masterItems = [
-    { to: "/roles", icon: "🛠️", label: "Role Master" },
-    { to: "/labours", icon: "👷", label: "Labour Master" },
-    { to: "/products", icon: "📦", label: "Item Master" },
+    { to: "/roles", icon: "🛠️", label: t("roleMaster") },
+    { to: "/labours", icon: "👷", label: t("labourMaster") },
+    { to: "/products", icon: "📦", label: t("itemMaster") },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-800 font-sans">
+    <div className="flex h-screen bg-gray-50 text-gray-800 font-sans overflow-hidden">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 text-white transition-all duration-300 ease-in-out flex flex-col shadow-2xl z-20 border-r border-gray-700`}
+        className={`fixed lg:static inset-y-0 left-0 z-30 h-full bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 text-white transition-all duration-300 ease-in-out flex flex-col shadow-2xl border-r border-gray-700
+          ${
+            isSidebarOpen
+              ? "w-64 translate-x-0"
+              : "w-64 -translate-x-full lg:translate-x-0 lg:w-20"
+          }
+        `}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700/50 h-16 bg-gray-900/50">
-          {isSidebarOpen && (
-            <h1 className="text-lg font-bold tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-              SUGANYA METALS
+          <div
+            className={`transition-opacity duration-200 ${
+              !isSidebarOpen && "lg:opacity-0 lg:hidden"
+            }`}
+          >
+            <h1 className="text-lg font-bold tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent whitespace-nowrap">
+              {t("companyName")}
             </h1>
-          )}
+          </div>
+
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-700/50 focus:outline-none transition-all duration-200 transform hover:scale-110"
+            className="p-2 rounded-lg hover:bg-gray-700/50 focus:outline-none transition-all duration-200 transform hover:scale-110 hidden lg:block"
           >
             <svg
               className="w-5 h-5"
@@ -147,20 +167,41 @@ const Layout = () => {
               />
             </svg>
           </button>
+
+          {/* Mobile Close Button */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-2 rounded-lg hover:bg-gray-700/50 focus:outline-none lg:hidden"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 custom-scrollbar">
           <SidebarItem
             to="/"
             icon="🏠"
-            label="Dashboard"
+            label={t("dashboard")}
             isOpen={isSidebarOpen}
           />
 
           <DropdownSection
-            title="Masters"
+            title={t("masters")}
             icon="📚"
             items={masterItems}
+            isOpen={isSidebarOpen}
             isSidebarOpen={isSidebarOpen}
           />
 
@@ -169,19 +210,31 @@ const Layout = () => {
           <SidebarItem
             to="/production"
             icon="📝"
-            label="Daily Entry"
+            label={t("dailyEntry")}
             isOpen={isSidebarOpen}
           />
           <SidebarItem
             to="/salary"
             icon="💰"
-            label="Weekly Salary"
+            label={t("weeklySalary")}
+            isOpen={isSidebarOpen}
+          />
+          <SidebarItem
+            to="/advances"
+            icon="💸"
+            label={t("advanceEntry")}
+            isOpen={isSidebarOpen}
+          />
+          <SidebarItem
+            to="/advances/history"
+            icon="📜"
+            label={t("advanceHistory")}
             isOpen={isSidebarOpen}
           />
           <SidebarItem
             to="/payments"
             icon="💳"
-            label="Payments"
+            label={t("payments")}
             isOpen={isSidebarOpen}
           />
         </nav>
@@ -189,8 +242,8 @@ const Layout = () => {
         <div className="p-4 border-t border-gray-700/50 bg-gray-900/30">
           {isSidebarOpen && user && (
             <div className="mb-3 px-3 py-2 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg border border-gray-600">
-              <p className="text-xs text-gray-400">Logged in as</p>
-              <p className="text-sm text-white font-semibold">
+              <p className="text-xs text-gray-400">{t("loggedInAs")}</p>
+              <p className="text-sm text-white font-semibold truncate">
                 {user.username}
               </p>
             </div>
@@ -200,31 +253,57 @@ const Layout = () => {
             className="w-full flex items-center justify-center gap-2 p-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
           >
             <LogOut size={18} />
-            {isSidebarOpen && <span className="font-medium">Logout</span>}
+            {isSidebarOpen && (
+              <span className="font-medium">{t("logout")}</span>
+            )}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 border-b border-gray-100">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-            Production & Salary System
-          </h2>
+      <main className="flex-1 flex flex-col h-screen overflow-hidden w-full">
+        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 sm:px-6 z-10 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600 lg:hidden"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+            <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent truncate">
+              {window.innerWidth < 640 ? t("companyName") : t("appTitle")}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher /> {/* Add Switcher */}
+            <div className="hidden sm:block px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-xs text-blue-600 font-semibold">
                 {new Date().toLocaleDateString()}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold border-2 border-blue-200 shadow-lg transform hover:scale-110 transition-transform cursor-pointer">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold border-2 border-blue-200 shadow-lg transform hover:scale-110 transition-transform cursor-pointer">
               {user?.username?.charAt(0).toUpperCase() || "A"}
             </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-gray-50 to-blue-50/30">
-          <div className="max-w-7xl mx-auto">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-blue-50/30">
+          <div className="max-w-7xl mx-auto h-full">
             <Outlet />
           </div>
         </div>

@@ -10,8 +10,10 @@ import {
   Download,
   Printer,
 } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 const WeeklySalary = () => {
+  const { t } = useLanguage();
   const today = new Date();
   const day = today.getDay();
   const diff = today.getDate() - day + (day === 0 ? -6 : 1);
@@ -41,20 +43,23 @@ const WeeklySalary = () => {
   });
 
   const totalPayout =
-    salaryReport?.reduce((sum, item) => sum + item.total_amount, 0) || 0;
+    salaryReport?.reduce((sum, item) => sum + item.net_payable, 0) || 0;
 
   const exportToExcel = () => {
+    // ... export logic keeps English keys for Excel usually, or we can translate headers
     if (!salaryReport || salaryReport.length === 0) {
       alert("No data to export");
       return;
     }
 
     const data = salaryReport.map((item) => ({
-      "Labour Name": item.labour_name,
-      "Days Worked": item.days_worked,
-      "Total KG": item.total_kg.toFixed(2),
-      "Total Amount (₹)": item.total_amount.toFixed(2),
-      Status: item.status,
+      [t("labourMaster")]: item.labour_name,
+      [t("daysWorked")]: item.days_worked,
+      [t("totalKg")]: item.total_kg.toFixed(2),
+      [`${t("grossAmount")} (₹)`]: item.total_amount.toFixed(2),
+      [`${t("lessAdvance")} (₹)`]: item.total_advance.toFixed(2),
+      [`${t("netAmount")} (₹)`]: item.net_payable.toFixed(2),
+      [t("status")]: item.status,
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
@@ -84,7 +89,7 @@ const WeeklySalary = () => {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 no-print">
         <h1 className="text-2xl font-bold text-gray-800">
-          Weekly Salary Report
+          {t("weeklySalaryReport")}
         </h1>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -95,7 +100,7 @@ const WeeklySalary = () => {
             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
             <Download size={18} />
-            Export Excel
+            {t("exportExcel")}
           </button>
           <button
             onClick={handlePrint}
@@ -103,7 +108,7 @@ const WeeklySalary = () => {
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
             <Printer size={18} />
-            Print
+            {t("print")}
           </button>
         </div>
       </div>
@@ -134,7 +139,7 @@ const WeeklySalary = () => {
             value={selectedLabour}
             onChange={(e) => setSelectedLabour(e.target.value)}
           >
-            <option value="">All Labours</option>
+            <option value="">{t("allLabours")}</option>
             {labours?.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
@@ -147,8 +152,8 @@ const WeeklySalary = () => {
       {/* Print Header - Only visible when printing */}
       <div className="print-only mb-6">
         <div className="text-center mb-4 border-b-2 border-gray-800 pb-4">
-          <h1 className="text-3xl font-bold">SUGANYA METALS</h1>
-          <p className="text-lg mt-1">Weekly Salary Report</p>
+          <h1 className="text-3xl font-bold">{t("companyName")}</h1>
+          <p className="text-lg mt-1">{t("weeklySalaryReport")}</p>
           <p className="text-sm text-gray-600 mt-2">
             Period: {startDate} to {endDate}
           </p>
@@ -162,12 +167,14 @@ const WeeklySalary = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-600 text-white p-4 rounded-xl shadow-lg">
           <p className="text-blue-100 text-sm font-medium">
-            Total Salary Payable
+            {t("totalSalaryPayable")}
           </p>
           <p className="text-2xl font-bold mt-1">₹{totalPayout.toFixed(2)}</p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-orange-100">
-          <p className="text-gray-500 text-sm font-medium">Total KG Produced</p>
+          <p className="text-gray-500 text-sm font-medium">
+            {t("totalKgProduced")}
+          </p>
           <p className="text-2xl font-bold text-gray-800 mt-1">
             {salaryReport
               ?.reduce((sum, item) => sum + item.total_kg, 0)
@@ -176,7 +183,9 @@ const WeeklySalary = () => {
           </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100">
-          <p className="text-gray-500 text-sm font-medium">Active Labours</p>
+          <p className="text-gray-500 text-sm font-medium">
+            {t("activeLabours")}
+          </p>
           <p className="text-2xl font-bold text-gray-800 mt-1">
             {salaryReport?.length || 0}
           </p>
@@ -186,21 +195,23 @@ const WeeklySalary = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-gray-500">
-            Loading salary data...
+            {t("loadingSalary")}
           </div>
         ) : salaryReport?.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No records found for this period.
-          </div>
+          <div className="p-8 text-center text-gray-500">{t("noRecords")}</div>
         ) : (
           <table className="w-full text-left">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-600 uppercase text-sm font-semibold">
               <tr>
-                <th className="p-4">Labour Name</th>
-                <th className="p-4 text-center">Days Worked</th>
-                <th className="p-4 text-right">Total KG</th>
-                <th className="p-4 text-right">Total Amount</th>
-                <th className="p-4 text-center">Status</th>
+                <th className="p-4">{t("labourMaster")}</th>
+                <th className="p-4 text-center">{t("daysWorked")}</th>
+                <th className="p-4 text-right">{t("totalKg")}</th>
+                <th className="p-4 text-right">{t("grossAmount")}</th>
+                <th className="p-4 text-right text-red-600">
+                  {t("lessAdvance")}
+                </th>
+                <th className="p-4 text-right">{t("netAmount")}</th>
+                <th className="p-4 text-center">{t("status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -218,17 +229,25 @@ const WeeklySalary = () => {
                   <td className="p-4 text-right font-mono text-gray-700">
                     {item.total_kg.toFixed(2)}
                   </td>
-                  <td className="p-4 text-right font-bold text-green-600">
+                  <td className="p-4 text-right font-mono text-gray-600">
                     ₹{item.total_amount.toFixed(2)}
+                  </td>
+                  <td className="p-4 text-right font-mono text-red-500">
+                    {item.total_advance > 0
+                      ? `-₹${item.total_advance.toFixed(2)}`
+                      : "-"}
+                  </td>
+                  <td className="p-4 text-right font-bold text-green-600">
+                    ₹{item.net_payable.toFixed(2)}
                   </td>
                   <td className="p-4 text-center">
                     {item.status === "Paid" ? (
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                        <CheckCircle size={12} /> Paid
+                        <CheckCircle size={12} /> {t("paid")}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                        Pending
+                        {t("pending")}
                       </span>
                     )}
                   </td>
@@ -241,7 +260,19 @@ const WeeklySalary = () => {
                   colSpan="3"
                   className="p-4 text-right font-bold text-gray-800"
                 >
-                  TOTAL PAYABLE:
+                  {t("totalPayable")}:
+                </td>
+                <td className="p-4 text-right font-bold text-gray-600">
+                  ₹
+                  {salaryReport
+                    ?.reduce((sum, item) => sum + item.total_amount, 0)
+                    .toFixed(2)}
+                </td>
+                <td className="p-4 text-right font-bold text-red-500">
+                  -₹
+                  {salaryReport
+                    ?.reduce((sum, item) => sum + item.total_advance, 0)
+                    .toFixed(2)}
                 </td>
                 <td className="p-4 text-right font-bold text-green-600 text-lg">
                   ₹{totalPayout.toFixed(2)}

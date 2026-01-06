@@ -43,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/production", productionRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/advances", require("./src/routes/advanceRoutes"));
 
 app.use("/api/payments", paymentRoutes);
 
@@ -64,3 +65,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// Trigger restart
