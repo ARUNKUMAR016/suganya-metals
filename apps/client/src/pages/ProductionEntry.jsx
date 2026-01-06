@@ -203,7 +203,7 @@ const ProductionEntry = () => {
                 </div>
                 <div className="w-full md:w-24">
                   <label className="text-xs font-semibold text-gray-500 mb-1 block">
-                    Pcs (Opt)
+                    Pcs (எண்)
                   </label>
                   <input
                     type="number"
@@ -215,7 +215,7 @@ const ProductionEntry = () => {
                 </div>
                 <div className="w-full md:w-32">
                   <label className="text-xs font-semibold text-gray-500 mb-1 block">
-                    Weight (KG)
+                    Weight (எடை - KG)
                   </label>
                   <input
                     type="number"

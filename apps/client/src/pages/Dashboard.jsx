@@ -12,6 +12,7 @@ import {
   CreditCard,
   Plus,
   ArrowUpRight,
+  ShieldCheck,
 } from "lucide-react";
 
 const StatCard = ({
@@ -115,6 +116,27 @@ const Dashboard = () => {
           <Plus size={20} />
           Record Production
         </button>
+      </div>
+
+      {/* Backup Reminder */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-sm gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white rounded-xl shadow-sm text-blue-600">
+            <ShieldCheck size={28} />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-800 text-lg">
+              Weekly Data Backup
+            </h3>
+            <p className="text-gray-600">
+              Remember to download a backup of your database every week to
+              ensure data safety.
+            </p>
+          </div>
+        </div>
+        <div className="text-sm font-semibold text-blue-700 bg-white/50 px-4 py-2 rounded-lg border border-blue-100">
+          Status: Protected (Roles/Labour safe)
+        </div>
       </div>
 
       {/* Stats Grid */}

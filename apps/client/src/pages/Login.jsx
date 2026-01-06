@@ -22,7 +22,7 @@ const Login = () => {
       const response = await api.post("/auth/login", { username, password });
 
       if (response.data.success) {
-        login(response.data.user);
+        login(response.data.user, response.data.token);
         navigate("/");
       }
     } catch (err) {
@@ -71,28 +71,28 @@ const Login = () => {
           )}
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-dark-brown">
-              Username
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Username (பயனர் பெயர்)
             </label>
-            <div className="relative group">
+            <div className="relative">
               <User
                 size={20}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-saffron transition-colors"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
                 type="text"
                 required
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-saffron focus:ring-4 focus:ring-saffron/20 outline-none transition-all duration-200 bg-white/50"
-                placeholder="Enter username"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                placeholder="Enter username / பெயர்"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-dark-brown">
-              Password
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password (கடவுச்சொல்)
             </label>
             <div className="relative group">
               <Lock
@@ -152,9 +152,7 @@ const Login = () => {
         <div className="mt-6 text-center">
           <p className="text-xs text-dark-brown/60 bg-sandal/30 px-4 py-2 rounded-lg inline-block border border-gold/10">
             Default credentials:{" "}
-            <span className="font-semibold text-kumkum">
-              admin / sugany123
-            </span>
+            <span className="font-semibold text-kumkum">admin / sugany123</span>
           </p>
         </div>
       </div>

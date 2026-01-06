@@ -35,15 +35,17 @@ const salaryRoutes = require("./src/routes/salaryRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 
-app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/roles", roleRoutes);
-app.use("/api/labours", labourRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/production", productionRoutes);
-app.use("/api/salary", salaryRoutes);
+const { protect } = require("./src/middleware/authMiddleware");
 
-app.use("/api/advances", require("./src/routes/advanceRoutes"));
+app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", protect, dashboardRoutes);
+app.use("/api/roles", protect, roleRoutes);
+app.use("/api/labours", protect, labourRoutes);
+app.use("/api/products", protect, productRoutes);
+app.use("/api/production", protect, productionRoutes);
+app.use("/api/salary", protect, salaryRoutes);
+
+app.use("/api/advances", protect, require("./src/routes/advanceRoutes"));
 
 // Serve static files from the client app
 app.use(express.static(path.join(__dirname, "../client/dist")));
@@ -55,10 +57,21 @@ app.get(/(.*)/, (req, res) => {
 });
 
 // Global Error Handler
-app.use((err, req, res, next) => {
-  console.error("Global Error:", err);
-  res.status(500).json({ error: "Something went wrong!" });
-});
+const { errorMiddleware } = require("./src/middleware/errorMiddleware");
+app.use(errorMiddleware);
+
+// Validate essential environment variables
+const requiredEnvVars = ["DATABASE_URL", "JWT_SECRET"];
+const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
+
+if (missingEnvVars.length > 0) {
+  console.error(
+    "❌ FATAL ERROR: Missing required environment variables:\n" +
+      missingEnvVars.map((key) => `   - ${key}`).join("\n") +
+      "\n\nPlease create a .env file based on .env.example"
+  );
+  process.exit(1);
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

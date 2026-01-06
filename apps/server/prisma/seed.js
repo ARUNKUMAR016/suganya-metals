@@ -34,6 +34,19 @@ async function main() {
       });
     }
   }
+
+  // Create default admin user
+  const adminPassword = await require("bcryptjs").hash("sugany123", 10);
+  await prisma.user.upsert({
+    where: { username: "admin" },
+    update: {},
+    create: {
+      username: "admin",
+      password: adminPassword,
+      role: "admin",
+    },
+  });
+  console.log("Seeding completed.");
 }
 
 main()
